@@ -3,6 +3,10 @@ A command-line tool that reads an image and writes another image with distinct t
 
 Some of the sample images are from *Commander Keen: Secret of the Oracle* and *Wolfenstein 3D* by id Software.
 
+Example (original on the left, output with default settings on the right):
+![Wolfenstein 3D title screen](test-in/wolf3d.png)
+![unique tiles in Wolfenstein 3D title screen](example.png)
+
 ## Command-line arguments
 *inputFile* *outputFile* *tileSize* *tileOrder*
 
