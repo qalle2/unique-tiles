@@ -4,6 +4,7 @@ A command-line tool that reads an image and writes another image with distinct t
 Some of the sample images are from *Commander Keen: Secret of the Oracle* and *Wolfenstein 3D* by id Software.
 
 Example (original on the left, output with default settings on the right):
+
 ![Wolfenstein 3D title screen](test-in/wolf3d.png)
 ![unique tiles in Wolfenstein 3D title screen](example.png)
 
@@ -17,8 +18,8 @@ You may omit the fourth or both the third and the fourth argument.
 * *tileSize*: The width and height of each tile, in pixels. 4 to 64. The default is 8.
 * *tileOrder*: Order of tiles in the output image. One of these:
   * `O`: original (the first tile to occur in *inputFile* will occur first in *outputFile*; this is the default)
-  * `P`: first by brightness of pixels, top left pixel first, then by original order
+  * `P`: first by brightnesses of pixels, top left pixel first, then by original order
   * `A`: first by average brightness of each tile, then by original order
   * `C`: first by number of unique colors, then by original order
-  * `CP`: first by number of unique colors, then by brightness of pixels, then by original order
+  * `CP`: first by number of unique colors, then by brightnesses of pixels, then by original order
   * `CA`: first by number of unique colors, then by average brightness of each tile, then by original order
