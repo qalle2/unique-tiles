@@ -20,7 +20,8 @@ def parse_arguments():
         "See README.md for more info."
     )
 
-    parser.add_argument("--tilesize", type=int, default=8)
+    parser.add_argument("--tilewidth", type=int, default=8)
+    parser.add_argument("--tileheight", type=int, default=8)
     parser.add_argument(
         "--tileorder", choices=("o", "p", "a", "c", "cp", "ca"), default="o"
     )
@@ -31,8 +32,10 @@ def parse_arguments():
 
     args = parser.parse_args()
 
-    if not 4 <= args.tilesize <= 64:
-        sys.exit("Tile size argument is not valid.")
+    if not 4 <= args.tilewidth <= 64:
+        sys.exit("Tile width argument is not valid.")
+    if not 4 <= args.tileheight <= 64:
+        sys.exit("Tile height argument is not valid.")
 
     if not os.path.isfile(args.inputfile):
         sys.exit("Input file not found.")
@@ -41,18 +44,17 @@ def parse_arguments():
 
     return args
 
-def get_unique_tiles(handle, tileSize):
-    # tileSize: tile width & height
+def get_unique_tiles(handle, tileWidth, tileHeight):
     # return: list of unique tuples of (red, green, blue) tuples in original
-    #         order
+    # order
 
     handle.seek(0)
     image = Image.open(handle)
 
-    if image.width == 0 or image.width % tileSize:
-        sys.exit("Image width is not valid.")
-    if image.height == 0 or image.height % tileSize:
-        sys.exit("Image height is not valid.")
+    if image.width == 0 or image.width % tileWidth:
+        sys.exit("Image width is not a multiple of tile width.")
+    if image.height == 0 or image.height % tileHeight:
+        sys.exit("Image height is not a multiple of tile height.")
 
     if image.mode in ("L", "P"):
         image = image.convert("RGB")
@@ -62,32 +64,33 @@ def get_unique_tiles(handle, tileSize):
     # TODO: perhaps maintain a separate set to speed up lookup?
     uniqueTiles = []
 
-    for y in range(0, image.height, tileSize):
-        for x in range(0, image.width, tileSize):
+    for y in range(0, image.height, tileHeight):
+        for x in range(0, image.width, tileWidth):
             tile = tuple(
-                image.crop((x, y, x + tileSize, y + tileSize)).getdata()
+                image.crop((x, y, x + tileWidth, y + tileHeight)).getdata()
             )
             if tile not in uniqueTiles:
                 uniqueTiles.append(tile)
 
     return uniqueTiles
 
-def write_image(handle, uniqueTiles, tileSize):
+def write_image(handle, uniqueTiles, tileWidth, tileHeight):
     # write unique tiles to an image;
-    # tileSize: tile width & height
     # uniqueTiles: list of tuples of (red, green, blue) tuples
 
-    width = TILES_PER_ROW * tileSize
-    # height = ceil(len(uniqueTiles) / TILES_PER_ROW) * tileSize
-    height = (len(uniqueTiles) + TILES_PER_ROW - 1) // TILES_PER_ROW * tileSize
+    width = TILES_PER_ROW * tileWidth
+    # height = ceil(len(uniqueTiles) / TILES_PER_ROW) * tileHeight
+    height = (
+        (len(uniqueTiles) + TILES_PER_ROW - 1) // TILES_PER_ROW * tileHeight
+    )
     image = Image.new("RGB", (width, height), BACKGROUND_COLOR)
 
     # copy pixels to image via temporary image
-    tileImage = Image.new("RGB", (tileSize, tileSize))
+    tileImage = Image.new("RGB", (tileWidth, tileHeight))
     for (i, tile) in enumerate(uniqueTiles):
         (y, x) = divmod(i, TILES_PER_ROW)
         tileImage.putdata(tile)
-        image.paste(tileImage, (x * tileSize, y * tileSize))
+        image.paste(tileImage, (x * tileWidth, y * tileHeight))
 
     handle.seek(0)
     image.save(handle, "png")
@@ -100,7 +103,9 @@ def main():
 
     try:
         with open(args.inputfile, "rb") as handle:
-            uniqueTiles = get_unique_tiles(handle, args.tilesize)
+            uniqueTiles = get_unique_tiles(
+                handle, args.tilewidth, args.tileheight
+            )
     except OSError:
         sys.exit("Error reading input file.")
 
@@ -133,7 +138,7 @@ def main():
 
     try:
         with open(args.outputfile, "wb") as handle:
-            write_image(handle, uniqueTiles, args.tilesize)
+            write_image(handle, uniqueTiles, args.tilewidth, args.tileheight)
     except OSError:
         sys.exit("Error writing output file.")
 
