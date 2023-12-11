@@ -16,7 +16,7 @@ python3 uniquetiles.py test-in/wolf3d.png          test-out/wolf3d-a.png        
 echo
 
 echo "=== These should cause 7 distinct errors ==="
-python3 uniquetiles.py test-in/wolf3d.png     test-out/test1.png --tilewidth 1
+python3 uniquetiles.py test-in/wolf3d.png     test-out/test1.png --tilewidth 0
 python3 uniquetiles.py test-in/nonexistent    test-out/test2.png
 python3 uniquetiles.py test-in/wolf3d.png     test-out/already-exists
 python3 uniquetiles.py test-in/wolf3d.png     test-out/nonexistent/

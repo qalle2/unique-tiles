@@ -32,9 +32,9 @@ def parse_arguments():
 
     args = parser.parse_args()
 
-    if not 4 <= args.tilewidth <= 64:
+    if not 1 <= args.tilewidth <= 1024:
         sys.exit("Tile width argument is not valid.")
-    if not 4 <= args.tileheight <= 64:
+    if not 1 <= args.tileheight <= 1024:
         sys.exit("Tile height argument is not valid.")
 
     if not os.path.isfile(args.inputfile):

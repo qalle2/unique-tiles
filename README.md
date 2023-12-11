@@ -11,8 +11,8 @@ Example (original on the left, output with default settings on the right):
 ## Command line arguments
 *options* *inputFile* *outputFile*
 * *options* are any number of these, separated by spaces:
-  * `--tilewidth N`: The width of each tile, in pixels. `N` is 4 to 64. The default is 8.
-  * `--tileheight N`: The height of each tile, in pixels. `N` is 4 to 64. The default is 8.
+  * `--tilewidth N`: The width of each tile, in pixels. `N` is 1 to 1024. The default is 8.
+  * `--tileheight N`: The height of each tile, in pixels. `N` is 1 to 1024. The default is 8.
   * `--tileorder V`: Order of tiles in the output image. `V` is one of these:
     * `o`: original (the first tile to occur in *inputFile* will occur first in *outputFile*; this is the default)
     * `p`: first by brightnesses of pixels, top left pixel first, then by original order
