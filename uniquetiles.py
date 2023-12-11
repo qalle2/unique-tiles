@@ -1,6 +1,6 @@
 # convert an image into a PNG with unique tiles (squares) only
 
-import os, sys
+import argparse, os, sys
 from collections import OrderedDict
 from itertools import chain
 try:
@@ -15,35 +15,30 @@ TILES_PER_ROW = 16
 def parse_arguments():
     # parse command line arguments
 
-    if not 3 <= len(sys.argv) <= 5:
-        sys.exit(
-            "Convert an image into a PNG with distinct tiles only. "
-            "Arguments: inputFile outputFile [tileSize [tileOrder]]. "
-            "See README.md for more info."
-        )
+    parser = argparse.ArgumentParser(
+        description="Convert an image into a PNG with distinct tiles only. "
+        "See README.md for more info."
+    )
 
-    # files
-    (inputFile, outputFile) = sys.argv[1:3]
-    if not os.path.isfile(inputFile):
-        sys.exit("Input file not found.")
-    if os.path.exists(outputFile):
-        sys.exit("Output file already exists.")
+    parser.add_argument("--tilesize", type=int, default=8)
+    parser.add_argument(
+        "--tileorder", choices=("o", "p", "a", "c", "cp", "ca"), default="o"
+    )
+    #parser.add_argument("--verbose", action="store_true")
+    parser.add_argument("inputfile")
+    parser.add_argument("outputfile")
 
-    # tile size
-    tileSize = sys.argv[3] if len(sys.argv) >= 4 else "8"
-    try:
-        tileSize = int(tileSize)
-        if not 4 <= tileSize <= 64:
-            raise ValueError
-    except ValueError:
+    args = parser.parse_args()
+
+    if not 4 <= args.tilesize <= 64:
         sys.exit("Tile size argument is not valid.")
 
-    # order
-    tileOrder = sys.argv[4].upper() if len(sys.argv) >= 5 else "O"
-    if tileOrder not in ("O", "P", "A", "C", "CP", "CA"):
-        sys.exit("Tile order argument is not valid.")
+    if not os.path.isfile(args.inputfile):
+        sys.exit("Input file not found.")
+    if os.path.exists(args.outputfile):
+        sys.exit("Output file already exists.")
 
-    return (inputFile, outputFile, tileSize, tileOrder)
+    return args
 
 def get_unique_tiles(handle, tileSize):
     # tileSize: tile width & height
@@ -100,11 +95,11 @@ def rgb_to_grayscale(red, green, blue):
     return red * 2 + green * 3 + blue
 
 def main():
-    (inputFile, outputFile, tileSize, tileOrder) = parse_arguments()
+    args = parse_arguments()
 
     try:
-        with open(inputFile, "rb") as handle:
-            uniqueTiles = get_unique_tiles(handle, tileSize)
+        with open(args.inputfile, "rb") as handle:
+            uniqueTiles = get_unique_tiles(handle, args.tilesize)
     except OSError:
         sys.exit("Error reading input file.")
 
@@ -113,26 +108,26 @@ def main():
     print("Min. unique colors/tile:", min(len(set(t)) for t in uniqueTiles))
     print("Max. unique colors/tile:", max(len(set(t)) for t in uniqueTiles))
 
-    if tileOrder == "O":
+    if args.tileorder == "o":
         pass
-    elif tileOrder == "P":
+    elif args.tileorder == "p":
         uniqueTiles.sort(key=lambda t: tuple(rgb_to_grayscale(*p) for p in t))
-    elif tileOrder == "A":
+    elif args.tileorder == "a":
         uniqueTiles.sort(key=lambda t: sum(rgb_to_grayscale(*p) for p in t))
-    elif tileOrder == "C":
+    elif args.tileorder == "c":
         uniqueTiles.sort(key=lambda t: len(set(t)))
-    elif tileOrder == "CP":
+    elif args.tileorder == "cp":
         uniqueTiles.sort(key=lambda t: tuple(rgb_to_grayscale(*p) for p in t))
         uniqueTiles.sort(key=lambda t: len(set(t)))
-    elif tileOrder == "CA":
+    elif args.tileorder == "ca":
         uniqueTiles.sort(key=lambda t: sum(rgb_to_grayscale(*p) for p in t))
         uniqueTiles.sort(key=lambda t: len(set(t)))
     else:
         sys.exit("Something went wrong.")
 
     try:
-        with open(outputFile, "wb") as handle:
-            write_image(handle, uniqueTiles, tileSize)
+        with open(args.outputfile, "wb") as handle:
+            write_image(handle, uniqueTiles, args.tilesize)
     except OSError:
         sys.exit("Error writing output file.")
 
