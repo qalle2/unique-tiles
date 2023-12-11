@@ -24,7 +24,8 @@ def parse_arguments():
     parser.add_argument(
         "--tileorder", choices=("o", "p", "a", "c", "cp", "ca"), default="o"
     )
-    #parser.add_argument("--verbose", action="store_true")
+    parser.add_argument("--verbose", action="store_true")
+
     parser.add_argument("inputfile")
     parser.add_argument("outputfile")
 
@@ -103,10 +104,15 @@ def main():
     except OSError:
         sys.exit("Error reading input file.")
 
-    print("Unique colors:", len(set(chain.from_iterable(uniqueTiles))))
-    print("Unique tiles:", len(uniqueTiles))
-    print("Min. unique colors/tile:", min(len(set(t)) for t in uniqueTiles))
-    print("Max. unique colors/tile:", max(len(set(t)) for t in uniqueTiles))
+    if args.verbose:
+        print("Unique colors:", len(set(chain.from_iterable(uniqueTiles))))
+        print("Unique tiles:", len(uniqueTiles))
+        print(
+            "Min. unique colors/tile:", min(len(set(t)) for t in uniqueTiles)
+        )
+        print(
+            "Max. unique colors/tile:", max(len(set(t)) for t in uniqueTiles)
+        )
 
     if args.tileorder == "o":
         pass
